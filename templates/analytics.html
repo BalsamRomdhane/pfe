@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - AI Compliance{% endblock %}
+{% block header %}Analytics{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">Analytics</h2>
+        <p class="card-subtitle">Get insights into compliance performance over time.</p>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="card kpi-card">
+        <div>
+          <p class="kpi-card-title">Total Documents</p>
+          <p class="kpi-card-value" id="analytics-documents">0</p>
+          <p class="kpi-card-note">Uploaded documents</p>
+        </div>
+        <div class="kpi-card-icon kpi-card-icon--primary">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+      </div>
+
+      <div class="card kpi-card">
+        <div>
+          <p class="kpi-card-title">Average Score</p>
+          <p class="kpi-card-value" id="analytics-score">0%</p>
+          <p class="kpi-card-note">Compliance score</p>
+        </div>
+        <div class="kpi-card-icon kpi-card-icon--secondary">
+          <i class="fa-solid fa-chart-pie"></i>
+        </div>
+      </div>
+
+      <div class="card kpi-card">
+        <div>
+          <p class="kpi-card-title">Violations</p>
+          <p class="kpi-card-value" id="analytics-violations">0</p>
+          <p class="kpi-card-note">Total issues</p>
+        </div>
+        <div class="kpi-card-icon kpi-card-icon--danger">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+      </div>
+
+      <div class="card kpi-card">
+        <div>
+          <p class="kpi-card-title">ATC Naming Violations</p>
+          <p class="kpi-card-value" id="analytics-atc-violations">0</p>
+          <p class="kpi-card-note">Noncompliant filenames</p>
+        </div>
+        <div class="kpi-card-icon kpi-card-icon--danger">
+          <i class="fa-solid fa-file-excel"></i>
+        </div>
+      </div>
+
+      <div class="card kpi-card">
+        <div>
+          <p class="kpi-card-title">Risks</p>
+          <p class="kpi-card-value" id="analytics-risks">0</p>
+          <p class="kpi-card-note">Risk events</p>
+        </div>
+        <div class="kpi-card-icon kpi-card-icon--warning">
+          <i class="fa-solid fa-shield-exclamation"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Violations per Standard</h3>
+      </div>
+      <div class="p-6">
+        <canvas id="analytics-violations-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Risk Distribution</h3>
+      </div>
+      <div class="p-6">
+        <canvas id="analytics-risks-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Documents Analyzed Over Time</h3>
+      </div>
+      <div class="p-6">
+        <canvas id="analytics-time-chart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Top Violations</h3>
+      </div>
+      <div class="p-6">
+        <canvas id="analytics-top-violations-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#analytics-violations-chart')) {
+      window.initAnalytics();
+    }
+  });
+</script>
+{% endblock %}

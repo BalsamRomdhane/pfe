@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}AI Compliance Platform{% endblock %}</title>
+
+    <!-- Tailwind CSS (bundle pre-built and served locally for production) -->
+    <!--
+      In production, build tailwind via the Tailwind CLI or PostCSS and output to
+      a static CSS file (e.g. static/css/style.css). The CDN build is not used.
+    -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <!-- FontAwesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+
+    <script>
+      // Ensure Tailwind config exists even if Tailwind isn't loaded yet.
+      window.tailwind = window.tailwind || {};
+      window.tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#6366F1',
+              secondary: '#06B6D4',
+              success: '#22C55E',
+              warning: '#F59E0B',
+              danger: '#EF4444',
+              surface: '#FFFFFF',
+              'surface-2': '#F8FAFC',
+              text: '#0F172A',
+              'text-secondary': '#64748B',
+              'sidebar-bg': '#0F172A',
+              'sidebar-hover': '#1E293B',
+              'sidebar-active': '#6366F1',
+            },
+            fontFamily: {
+              sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Tailwind CDN for utility classes (used by templates). Remove for production once CSS is pre-built. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {% block head %}{% endblock %}
+  </head>
+  <body class="bg-slate-50 text-slate-900">
+    <script>
+      // Provide CSRF token for JS requests (from Django context processor)
+      window.CSRF_TOKEN = "{{ csrf_token }}";
+    </script>
+
+    <div class="flex h-screen bg-slate-50">
+      {% include 'components/sidebar.html' %}
+
+      <div class="flex-1 flex flex-col overflow-hidden">
+        {% include 'components/topbar.html' %}
+
+        <main class="flex-1 overflow-y-auto p-8">
+          <div class="max-w-7xl mx-auto w-full space-y-6">
+            {% block content %}{% endblock %}
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Core scripts -->
+    <script src="{% static 'js/i18n.js' %}?v=2" defer></script>
+    <script src="{% static 'js/csrf.js' %}?v=2" defer></script>
+    <script src="{% static 'js/dashboard.js' %}?v=2" defer></script>
+
+    <script src="{% static 'js/documents.js' %}?v=2" defer></script>
+    <script src="{% static 'js/layout.js' %}?v=2" defer></script>
+    <script src="{% static 'js/audit.js' %}?v=3" defer></script>
+    <script src="{% static 'js/analytics.js' %}?v=2" defer></script>
+    <script src="{% static 'js/standards.js' %}?v=3" defer></script>
+    <script src="{% static 'js/chat.js' %}?v=2" defer></script>
+
+
+    <script defer>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof window.initLayout === 'function') {
+          window.initLayout();
+        }
+
+        // Activate the most specific sidebar link based on current path
+        const path = window.location.pathname;
+        const sidebarLinks = Array.from(document.querySelectorAll('.sidebar__link'));
+        let bestMatch = null;
+
+        sidebarLinks.forEach((link) => {
+          const target = link.getAttribute('data-nav');
+          if (!target) return;
+
+          const matches = path === target || (target !== '/' && path.startsWith(target));
+          if (!matches) return;
+
+          if (!bestMatch || target.length > bestMatch.getAttribute('data-nav').length) {
+            bestMatch = link;
+          }
+        });
+
+        if (bestMatch) {
+          bestMatch.classList.add('active');
+
+          // Update topbar title based on the active link's i18n key (if present)
+          const titleEl = document.querySelector('.topbar__title');
+          const titleTextEl = bestMatch.querySelector('[data-i18n]');
+          if (titleEl && titleTextEl) {
+            titleEl.textContent = i18n.t(titleTextEl.getAttribute('data-i18n'));
+          }
+        }
+
+        // Profile dropdown toggle (fallback if layout.js isn't available)
+        const profileToggle = document.getElementById('topbar-profile-toggle');
+        const profileDropdown = document.getElementById('topbar-profile');
+        const profileMenu = document.getElementById('topbar-profile-menu');
+        if (profileToggle && profileDropdown && profileMenu) {
+          profileToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            profileDropdown.classList.toggle('open');
+          });
+          document.addEventListener('click', (e) => {
+            if (!e.target.closest('#topbar-profile')) {
+              profileDropdown.classList.remove('open');
+            }
+          });
+        }
+
+        // Setup language switcher (if available)
+        const updateLanguageCheckmarks = () => {
+          document.querySelectorAll('[id^="lang-check-"]').forEach((el) => (el.style.display = 'none'));
+          if (window.i18n?.getLanguage) {
+            const currentLang = i18n.getLanguage();
+            const checkEl = document.getElementById(`lang-check-${currentLang}`);
+            if (checkEl) checkEl.style.display = 'inline';
+          }
+        };
+
+        updateLanguageCheckmarks();
+
+        const langToggle = document.getElementById('topbar-language-toggle');
+        const langMenu = document.getElementById('topbar-language-menu');
+        if (langToggle && langMenu) {
+          langToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langMenu.classList.toggle('show');
+          });
+          document.addEventListener('click', () => langMenu.classList.remove('show'));
+        }
+      });
+    </script>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

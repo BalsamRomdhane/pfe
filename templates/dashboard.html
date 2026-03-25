@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AI Compliance{% endblock %}
+{% block header %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-10">
+  <!-- Top banner / status message -->
+  <div id="dashboard-message" class="hidden p-4 rounded-2xl border border-blue-200 bg-blue-50 text-blue-800">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      </span>
+      <span class="text-sm font-medium" data-i18n="common.loading">Loading dashboard data…</span>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <section aria-labelledby="dashboard-kpis">
+    <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h1 id="dashboard-kpis" class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+        <p class="text-sm text-gray-600">Overview of document compliance and audit activity.</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="dashboard.total_documents">Total Documents</p>
+          <p id="stat-documents" class="mt-2 text-3xl font-semibold text-gray-900">0</p>
+          <p class="mt-1 text-xs text-gray-500">Documents uploaded to the platform.</p>
+        </div>
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+          <i class="fa-solid fa-file text-lg"></i>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="dashboard.compliance_score">Compliance Score</p>
+          <p id="stat-score" class="mt-2 text-3xl font-semibold text-gray-900">0%</p>
+          <p class="mt-1 text-xs text-gray-500">Average compliance score across audits.</p>
+        </div>
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700">
+          <i class="fa-solid fa-shield-check text-lg"></i>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="dashboard.violations">Violations</p>
+          <p id="stat-noncompliant" class="mt-2 text-3xl font-semibold text-gray-900">0</p>
+          <p class="mt-1 text-xs text-gray-500">Flagged compliance issues.</p>
+        </div>
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-700">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-gray-500" data-i18n="dashboard.risk_level">Risk Level</p>
+          <p id="stat-risk" class="mt-2 text-3xl font-semibold text-gray-900">Low</p>
+          <p class="mt-1 text-xs text-gray-500">Overall risk assessment.</p>
+        </div>
+        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+          <i class="fa-solid fa-chart-line text-lg"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section aria-labelledby="dashboard-charts">
+    <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h2 id="dashboard-charts" class="text-xl font-semibold text-gray-900">Charts</h2>
+        <p class="text-sm text-gray-600">Visual insights into compliance trends and violations.</p>
+      </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Compliance Score Distribution</h3>
+          <p class="text-sm text-gray-600 mt-1">Distribution of document compliance scores.</p>
+        </div>
+        <div class="h-64">
+          <canvas id="chart-score" class="h-full w-full"></canvas>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
+        <div class="mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Violations per Standard</h3>
+          <p class="text-sm text-gray-600 mt-1">Number of violations by compliance standard.</p>
+        </div>
+        <div class="h-64">
+          <canvas id="chart-violations" class="h-full w-full"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Audits Table -->
+  <section aria-labelledby="dashboard-recent-audits">
+    <div class="rounded-2xl bg-white border border-gray-200 shadow-sm">
+      <div class="px-6 py-5 border-b border-gray-200">
+        <h3 id="dashboard-recent-audits" class="text-lg font-semibold text-gray-900">Recent Audits</h3>
+        <p class="text-sm text-gray-600 mt-1">Latest compliance audit results.</p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200" id="recent-audits-table">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Document</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Standard</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Score</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</th>
+            </tr>
+          </thead>
+          <tbody id="recent-audits-tbody" class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-gray-500">Loading recent audits...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#chart-score')) {
+      window.initDashboard?.();
+    }
+  });
+</script>
+{% endblock %}

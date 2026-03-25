@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ATC Name Validator - AI Compliance{% endblock %}
+{% block header %}ATC Document Name Validator{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title">ATC Document Name Validator</h2>
+        <p class="card-subtitle">Check if a document filename follows the ATC naming convention.</p>
+      </div>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700" for="atc-filename">Document filename</label>
+          <input
+            id="filename-input"
+            type="text"
+            class="w-full rounded-lg border border-gray-200 px-4 py-3 shadow-sm focus:border-primary focus:ring-primary"
+            placeholder="e.g. COM_PRO_AQS_003_FR Procedure Gestion des Audits.pdf"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700" for="atc-file">Upload PDF (optional)</label>
+          <input
+            id="atc-file"
+            type="file"
+            accept="application/pdf"
+            class="w-full rounded-lg border border-gray-200 px-4 py-2 shadow-sm"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          id="validate-atc-btn"
+          class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
+        >
+          Validate ATC Name
+        </button>
+      </div>
+
+      <div id="validation-result" class="mt-4 hidden"></div>
+
+      <div id="atc-error" class="hidden rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/atc_validator.js' %}?v=1" defer></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.initATCValidator === 'function') {
+      window.initATCValidator();
+    }
+  });
+</script>
+{% endblock %}

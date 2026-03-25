@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}API Results - AI Compliance{% endblock %}
+{% block header %}API Results{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2>Audit API Results</h2>
+      <p class="text-muted mb-0">This is a browser-friendly view of the JSON returned by <code>/api/compliance/results/</code>.</p>
+    </div>
+    <a href="{% url 'audit_results' %}" class="btn btn-sm btn-primary">Go to Audit Dashboard</a>
+  </div>
+
+  <pre class="json-block">{{ payload }}</pre>
+</div>
+{% endblock %}

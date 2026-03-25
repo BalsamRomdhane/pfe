@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Documents - AI Compliance{% endblock %}
+{% block header %}<span data-i18n="documents.title">Documents</span>{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header Section -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2 class="card-title" data-i18n="documents.title">Documents</h2>
+        <p class="card-subtitle" data-i18n="documents.subtitle">View uploaded documents and delete items when no longer needed.</p>
+      </div>
+      <a href="{% url 'upload' %}" class="btn btn-primary inline-flex items-center gap-2">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span data-i18n="documents.upload_btn">Upload new documents</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="card">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="form-group">
+        <label class="form-label" for="filter-standard" data-i18n="documents.filter_standard">Filter by standard</label>
+        <select id="filter-standard" class="form-control" aria-label="Filter by standard">
+          <option value="" data-i18n="documents.all_standards">All standards</option>
+        </select>
+      </div>
+      <div class="form-group md:col-span-2">
+        <label class="form-label" for="filter-search" data-i18n="common.search">Search</label>
+        <input type="text" id="filter-search" class="form-control" data-i18n-placeholder="documents.search_placeholder" placeholder="File name or content" />
+      </div>
+      <div class="md:col-span-1 flex items-end">
+        <button class="btn btn-primary w-full" id="filter-apply" data-i18n="common.apply">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Table -->
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
+      <button class="btn btn-danger" id="delete-selected" disabled data-i18n="documents.delete_selected">
+        <i class="fa-solid fa-trash"></i>
+        <span>Delete selected</span>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 text-sm font-medium text-gray-600" for="select-all-documents">
+          <input class="w-4 h-4 rounded border-gray-300" type="checkbox" id="select-all-documents" />
+          <span data-i18n="documents.select_all">Select all</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="table" id="documents-table">
+        <thead>
+          <tr>
+            <th class="w-12"><!-- checkbox column --></th>
+            <th>ID</th>
+            <th data-i18n="documents.columns.file">File</th>
+            <th data-i18n="documents.columns.standard">Standard</th>
+            <th data-i18n="documents.columns.uploaded">Uploaded</th>
+            <th class="text-right" data-i18n="documents.columns.actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="documents-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mt-4">
+      <div id="documents-status" class="text-sm text-gray-600"></div>
+      <div id="documents-pagination" class="flex gap-2"></div>
+    </div>
+  </div>
+
+  <!-- No Documents State -->
+  <div id="no-documents-state" class="card text-center" style="display: none;">
+    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+      <i class="fa-solid fa-file fa-lg"></i>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-2" data-i18n="documents.no_documents">No documents found.</h3>
+    <p class="text-gray-600 text-sm mb-5" data-i18n="documents.loading">Upload documents to get started</p>
+    <a href="{% url 'upload' %}" class="btn btn-primary inline-flex items-center gap-2">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      Upload Documents
+    </a>
+  </div>
+</div>
+
+<!-- Analysis Modal -->
+<div id="analysis-modal" class="modal-backdrop" style="display: none;">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" data-i18n="analysis.title">Audit Analysis</h3>
+        <p id="analysis-doc-name" class="text-muted" style="margin: 0; font-size: 0.9rem;"></p>
+      </div>
+      <button type="button" class="modal-close" onclick="document.getElementById('analysis-modal').style.display='none';" aria-label="Close">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="analysis-content">
+      <p class="text-muted text-center" data-i18n="common.loading">Loading analysis...</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#documents-table')) {
+      window.initDocuments?.();
+    }
+  });
+</script>
+{% endblock %}

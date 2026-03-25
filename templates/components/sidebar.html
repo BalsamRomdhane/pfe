@@ -1,0 +1,61 @@
+<aside class="sidebar w-64 bg-slate-900 text-slate-200" id="sidebar" aria-label="Main navigation">
+  <div class="sidebar__brand px-4 py-5 border-b border-slate-800">
+    <div class="sidebar__logo" aria-hidden="true">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <div class="sidebar__brand-text">
+      <div class="sidebar__brand-name">ComplianceAI</div>
+      <div class="sidebar__brand-subtitle">AI Compliance</div>
+    </div>
+  </div>
+
+  <nav class="sidebar__nav p-4" aria-label="Primary">
+    <div class="sidebar__section">
+      <h2 class="sidebar__section-title" data-i18n="nav.section.core">Core</h2>
+      <a href="{% url 'dashboard' %}" class="sidebar__link" data-nav="/">
+        <i class="fa-solid fa-chart-line"></i>
+        <span data-i18n="nav.dashboard">Dashboard</span>
+      </a>
+      <a href="{% url 'documents' %}" class="sidebar__link" data-nav="/documents/">
+        <i class="fa-solid fa-folder-open"></i>
+        <span data-i18n="nav.documents">Documents</span>
+      </a>
+      <a href="{% url 'audit_results' %}" class="sidebar__link" data-nav="/audit-results/">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span data-i18n="nav.audit">Audits</span>
+      </a>
+    </div>
+
+    <div class="sidebar__section">
+      <h2 class="sidebar__section-title" data-i18n="nav.section.compliance">Compliance</h2>
+      <a href="{% url 'standards' %}" class="sidebar__link" data-nav="/standards/">
+        <i class="fa-solid fa-list-check"></i>
+        <span data-i18n="nav.standards">Standards</span>
+      </a>
+      <a href="{% url 'analytics' %}" class="sidebar__link" data-nav="/analytics/">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span data-i18n="nav.analytics">Analytics</span>
+      </a>
+      <a href="{% url 'atc-validator' %}" class="sidebar__link" data-nav="/atc-validator/">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>ATC Name Validator</span>
+      </a>
+    </div>
+
+    <div class="sidebar__section">
+      <h2 class="sidebar__section-title" data-i18n="nav.section.ai">AI</h2>
+      <a href="{% url 'chat' %}" class="sidebar__link" data-nav="/chat/">
+        <i class="fa-solid fa-brain"></i>
+        <span data-i18n="nav.chat">AI Assistant</span>
+      </a>
+    </div>
+
+    <div class="sidebar__section">
+      <h2 class="sidebar__section-title" data-i18n="nav.section.system">System</h2>
+      <a href="#" class="sidebar__link" data-nav="">
+        <i class="fa-solid fa-cog"></i>
+        <span data-i18n="nav.settings">Settings</span>
+      </a>
+    </div>
+  </nav>
+</aside>

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Documents - AI Compliance{% endblock %}
+{% block header %}Upload Documents{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Upload Documents</h2>
+      <p class="card-subtitle">Drag & drop files or click to select. After upload, run a compliance audit.</p>
+    </div>
+    <div class="w-full md:w-1/2">
+      <label class="form-label mb-1">Select Standard</label>
+      <select id="standardSelect" class="form-control"></select>
+    </div>
+  </div>
+
+  <div class="dropzone" id="dropzone">
+    <p class="mb-1"><i class="fa-solid fa-cloud-arrow-up fa-2x"></i></p>
+    <p class="font-semibold">Drop files here or click to browse</p>
+    <p class="hint">Supported: PDF, DOCX, PPTX, JPG, PNG</p>
+    <input type="file" id="fileInput" multiple hidden />
+  </div>
+
+  <div class="mt-4">
+    <div class="progress">
+      <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <div class="mt-3" id="uploadStatus"></div>
+  </div>
+
+  <div class="mt-4">
+    <h5 class="mb-2">Uploaded Documents</h5>
+    <ul class="list-group" id="uploadedList"></ul>
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button class="btn btn-primary" id="runAuditBtn" disabled>
+      <i class="fa-solid fa-play me-2"></i>
+      Run Audit
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/upload.js' %}" defer></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#dropzone')) {
+      window.initUpload();
+    }
+  });
+</script>
+{% endblock %}

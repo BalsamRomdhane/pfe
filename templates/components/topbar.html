@@ -1,0 +1,46 @@
+<header class="topbar">
+  <div class="topbar__left">
+    <button class="icon-btn" id="sidebarToggle" aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="topbar__page">
+      <h2 class="topbar__title">{% block header %}Dashboard{% endblock %}</h2>
+      <div class="topbar__breadcrumbs" aria-label="Breadcrumb">
+        {% block breadcrumbs %}{% endblock %}
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar__right">
+    <div class="topbar__search" role="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="topbar-search" type="search" class="form-control" placeholder="Search..." autocomplete="off" />
+    </div>
+
+    <button class="icon-btn" id="topbar-notifications" aria-label="Notifications">
+      <i class="fa-solid fa-bell"></i>
+      <span class="badge" id="topbar-notifications-count">3</span>
+    </button>
+
+    <div class="profile-dropdown" id="topbar-profile">
+      <button class="icon-btn" id="topbar-profile-toggle" aria-label="User menu">
+        <div class="topbar__avatar" aria-hidden="true">A</div>
+      </button>
+      <div class="profile-menu" id="topbar-profile-menu">
+        <div class="profile-menu-header">
+          <div class="profile-menu-avatar">A</div>
+          <div>
+            <div class="profile-name">Admin</div>
+            <div class="profile-email">admin@compliance.ai</div>
+          </div>
+        </div>
+        <div class="profile-menu-divider"></div>
+        <a href="#" class="profile-menu-item">Settings</a>
+        <a href="#" class="profile-menu-item">Help</a>
+        <div class="profile-menu-divider"></div>
+        <a href="#" class="profile-menu-item">Sign out</a>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Results - AI Compliance{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">Audit Results</h2>
+        <p class="text-gray-600 text-sm mt-1">A snapshot of the latest compliance audit with detailed findings, evidence, and recommendations.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{% url 'upload' %}" class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          Upload documents
+        </a>
+        <button id="refresh-results" class="inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700">
+          <i class="fa-solid fa-sync"></i>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="audit-loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+    <div class="bg-white rounded-lg p-6 flex items-center gap-4 shadow-lg">
+      <div class="animate-spin rounded-full h-10 w-10 border-4 border-sky-600 border-t-transparent"></div>
+      <span class="text-gray-700">Loading audit results...</span>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Compliance Score -->
+    <div class="card">
+      <div class="card-header">
+        <div class="flex items-center justify-between">
+          <h3 class="card-title">Compliance Score</h3>
+          <span id="score-badge" class="badge badge--info">Unknown</span>
+        </div>
+      </div>
+      <div class="p-6 flex flex-col items-center gap-4">
+        <div class="score-circle" id="score-circle">
+          <span id="score-value" class="text-2xl font-semibold text-gray-900">0%</span>
+        </div>
+        <p class="text-sm text-gray-500">Overall compliance rating</p>
+      </div>
+    </div>
+
+    <!-- Violations -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Violations</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <p class="text-4xl font-bold text-red-600" id="violations-count">0</p>
+          <span id="violations-status-badge" class="badge badge--success">None</span>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">Total issues detected</p>
+      </div>
+    </div>
+
+    <!-- Rules Evaluated -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Rules Evaluated</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-4xl font-bold text-gray-900" id="rules-count">0</p>
+        <p class="text-sm text-gray-500 mt-2">Compliance requirements checked</p>
+      </div>
+    </div>
+
+    <!-- Risk Level -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Risk Level</h3>
+      </div>
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <p class="text-4xl font-bold text-gray-900" id="risk-value">Low</p>
+          <span id="risk-level-badge" class="badge badge--success">Low</span>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">Risk assessment based on findings</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+    <!-- Main Column -->
+    <div class="xl:col-span-8 space-y-6">
+      <!-- Violations Table -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Violations</h3>
+            <p class="text-sm text-gray-500 mt-1">Issues detected during the audit, grouped by requirement.</p>
+          </div>
+          <span id="violations-summary" class="text-sm font-semibold text-gray-600">--</span>
+        </div>
+        <div class="overflow-x-auto mt-6">
+          <table class="w-full text-left" id="violations-table">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200">
+                <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Requirement</th>
+                <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Severity</th>
+                <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Evidence</th>
+                <th class="px-5 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wide">Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="violations-tbody">
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-500">No violations found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Evidence Section -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900">Evidence Found</h3>
+        <p class="text-sm text-gray-500 mt-1">Extracted passages that support the compliance evaluation.</p>
+        <div id="evidence-list" class="mt-6 grid grid-cols-1 gap-4">
+          <div class="rounded-lg border border-dashed border-gray-200 p-6 text-center text-gray-500">
+            No evidence available.
+          </div>
+        </div>
+      </div>
+
+      <!-- Detected Keywords -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900">Detected Keywords</h3>
+        <p class="text-sm text-gray-500 mt-1">Keywords found in the document that match compliance controls.</p>
+        <ul id="keyword-list" class="mt-4 space-y-2">
+          <li class="text-gray-500 text-sm">No keywords detected.</li>
+        </ul>
+      </div>
+
+      <!-- Audit History -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-semibold text-gray-900">Document Audit History</h3>
+          <p class="text-sm text-gray-600 mt-1">Historical results for past audits.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full" id="audit-table">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200">
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Document</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Standard</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Score</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody">
+              <tr>
+                <td colspan="5" class="px-6 py-8 text-center text-gray-500">No audit history available</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="xl:col-span-4 space-y-6">
+      <!-- Audit Pipeline Timeline -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Audit Pipeline</h3>
+        <div id="audit-pipeline-timeline" class="space-y-4">
+          <!-- Timeline will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Risks & Recommendations -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Risks & Recommendations</h3>
+        <div class="space-y-6">
+          <div>
+            <h4 class="text-sm font-semibold text-gray-800">Identified Risks</h4>
+            <div id="risks-list" class="mt-3 space-y-2">
+              <p class="text-gray-500 text-sm">No risks identified</p>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-sm font-semibold text-gray-800">Recommendations</h4>
+            <div id="recommendations-list" class="mt-3 space-y-2">
+              <p class="text-gray-500 text-sm">No recommendations available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Details -->
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Audit Details</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Document:</span>
+            <span class="font-medium text-gray-900" id="audit-document">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Standard:</span>
+            <span class="font-medium text-gray-900" id="audit-standard">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Created:</span>
+            <span class="font-medium text-gray-900" id="audit-created-at">-</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Last updated:</span>
+            <span class="font-medium text-gray-900" id="last-updated">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#audit-table')) {
+      window.initAuditResults?.();
+    }
+  });
+</script>
+{% endblock %}

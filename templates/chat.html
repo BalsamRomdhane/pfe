@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Compliance Chat - AI Compliance{% endblock %}
+{% block header %}Compliance Chat{% endblock %}
+
+{% block content %}
+<div class="card chat-card">
+  <div class="chat-header">
+    <div>
+      <h2 class="chat-title">AI Assistant</h2>
+      <p class="chat-subtitle">Ask questions about compliance, standards, or your documents.</p>
+    </div>
+  </div>
+
+  <div class="chat-window" id="chatWindow" role="log" aria-live="polite"></div>
+
+  <div class="chat-status" id="chatTyping" style="display: none;">
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+    <span>Assistant is typing…</span>
+  </div>
+
+  <form id="chatForm" class="chat-form">
+    <input type="text" id="chatInput" placeholder="Type your question..." autocomplete="off" />
+    <button type="submit" class="btn btn-primary">Send</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (document.querySelector('#chatForm')) {
+      window.initChat();
+    }
+  });
+</script>
+{% endblock %}
